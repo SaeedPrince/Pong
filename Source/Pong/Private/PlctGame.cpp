@@ -42,6 +42,7 @@ void APlctGame::BeginPlay()
 		if (IsValid(BallRef))
 		{
 			BallRef->OnBallScored.AddDynamic(this, &APlctGame::Goal);
+			BallRef->StartGame();
 		}
 	}
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APawnPong::StaticClass(), FoundActors);

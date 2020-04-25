@@ -1,6 +1,7 @@
 #include "PawnBall.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "InterfaceBehaviour.h"
+#include "Components/SphereComponent.h"
 
 APawnBall::APawnBall()
 {
@@ -14,6 +15,24 @@ APawnBall::APawnBall()
 FTimerHandle APawnBall::GetMovementTimer()
 {
 	return TimerMove;
+}
+
+void APawnBall::BeginPlay()
+{
+	Super::BeginPlay();
+	USceneComponent* root = GetRootComponent();
+	if (IsValid(root))
+	{
+		USceneComponent* rootChild = root->GetChildComponent(0);
+		if (IsValid(rootChild))
+		{
+			USphereComponent* Collision = Cast<USphereComponent>(rootChild->GetChildComponent(0));
+			if (IsValid(Collision))
+			{
+				Collision->OnComponentBeginOverlap.AddDynamic(this, &APawnBall::BallStartCollision);
+			}
+		}
+	}
 }
 
 void APawnBall::StartGame()

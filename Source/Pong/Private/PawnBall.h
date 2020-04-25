@@ -38,6 +38,8 @@ public:
 protected:
 
 	// Functions
+	virtual void BeginPlay() override;					// Runs at runtime fist and once
+
 	UFUNCTION(BlueprintCallable, Category = "Events")
 		void MoveBall();						// Moves the ball toward direction
 
