@@ -4,6 +4,9 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
+#include "Engine/EngineTypes.h"
+#include "GameFramework/PawnMovementComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 APlctGame::APlctGame()
 {
@@ -15,6 +18,7 @@ APlctGame::APlctGame()
 	ControllerMaxX = 120.0f;
 	ControllerMinX = -120.0f;
 	ControllerSpeed = 10.0f;
+	RestartTime = 0.1f;
 	BallLocation = FVector(0.0f, 0.0f, 40.0f);
 }
 
@@ -35,6 +39,10 @@ void APlctGame::BeginPlay()
 	if (FoundActors.Num() > 0)
 	{
 		BallRef = Cast<APawnBall>(FoundActors[0]);
+		if (IsValid(BallRef))
+		{
+			BallRef->OnBallScored.AddDynamic(this, &APlctGame::Goal);
+		}
 	}
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APawnPong::StaticClass(), FoundActors);
 	for (AActor* anyActor : FoundActors)
@@ -53,6 +61,32 @@ void APlctGame::BeginPlay()
 		{
 			widgetRef->AddToViewport(0);
 		}
+	}
+}
+
+void APlctGame::Goal(bool bLeft)
+{
+	bLeft ? LeftScore++ : RightScore++;
+	if (IsValid(BallRef))
+	{
+		FTimerHandle tim = BallRef->GetMovementTimer();
+		UKismetSystemLibrary::K2_ClearAndInvalidateTimerHandle(this, tim);
+		UPawnMovementComponent* MovementComp = BallRef->GetMovementComponent();
+		if (IsValid(MovementComp))
+		{
+			MovementComp->StopMovementImmediately();
+			FTimerHandle TimerRestart;
+			GetWorld()->GetTimerManager().SetTimer(TimerRestart, this, &APlctGame::RestartGame, RestartTime);
+		}
+	}
+}
+
+void APlctGame::RestartGame()
+{
+	if (IsValid(BallRef))
+	{
+		BallRef->SetActorLocation(BallLocation);
+		BallRef->StartGame();
 	}
 }
 

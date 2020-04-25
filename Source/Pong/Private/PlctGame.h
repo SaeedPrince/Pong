@@ -39,6 +39,12 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Input")	// Handles right controller
 		void RightControlAxis(float inAxisValue);
 
+	UFUNCTION(BlueprintCallable, Category = "Input")	// Goal
+		void Goal(bool bLeft);
+
+	UFUNCTION(BlueprintCallable, Category = "Input")	// Restart after goal
+		void RestartGame();
+
 	// Properties
 	UPROPERTY(BlueprintReadWrite, Category = "Score")
 		int32 LeftScore;				// Saves left player score
@@ -54,6 +60,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Customizations")
 		float ControllerSpeed;			// Saves right player score
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Customizations")
+		float RestartTime;				// Saves the time after goal
 
 	UPROPERTY(BlueprintReadWrite, Category = "Score")
 		FVector BallLocation;			// Saves initial ball location
